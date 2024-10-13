@@ -13,7 +13,9 @@ import DashboardLayout from "@/components/DashboardLayout";
 
 export default function RealTimeUpdates() {
   const [liveData, setLiveData] = useState({ timestamps: [], values: [] });
-  const svgRef = useRef();
+
+  // Explicitly typing the ref as RefObject<SVGSVGElement>
+  const svgRef = useRef<SVGSVGElement | null>(null);
 
   useEffect(() => {
     const fetchLiveUpdates = async () => {
@@ -38,7 +40,7 @@ export default function RealTimeUpdates() {
   }, []);
 
   // Function to update the D3 chart
-  const updateChart = (data) => {
+  const updateChart = (data: any) => {
     const svg = d3.select(svgRef.current);
     svg.selectAll("*").remove(); // Clear previous chart
 
@@ -51,7 +53,7 @@ export default function RealTimeUpdates() {
     // Define scales
     const xScale = d3
       .scaleTime()
-      .domain(d3.extent(data.timestamps, (d) => new Date(d)))
+      .domain(d3.extent(data.timestamps, (d: any) => new Date(d)))
       .range([margin.left, width - margin.right]);
 
     const yScale = d3
@@ -63,17 +65,17 @@ export default function RealTimeUpdates() {
     // Define line generator
     const line = d3
       .line()
-      .x((d, i) => xScale(new Date(data.timestamps[i])))
-      .y((d) => yScale(d));
+      .x((d: any, i: any) => xScale(new Date(data.timestamps[i])))
+      .y((d: any) => yScale(d));
 
     // Add the X-axis
-    const xAxis = (g) =>
+    const xAxis = (g: any) =>
       g
         .attr("transform", `translate(0,${height - margin.bottom})`)
         .call(d3.axisBottom(xScale).ticks(5));
 
     // Add the Y-axis
-    const yAxis = (g) =>
+    const yAxis = (g: any) =>
       g
         .attr("transform", `translate(${margin.left},0)`)
         .call(d3.axisLeft(yScale).ticks(5));
@@ -96,8 +98,8 @@ export default function RealTimeUpdates() {
       .selectAll("circle")
       .data(data.values)
       .join("circle")
-      .attr("cx", (d, i) => xScale(new Date(data.timestamps[i])))
-      .attr("cy", (d) => yScale(d))
+      .attr("cx", (d: any, i: any) => xScale(new Date(data.timestamps[i])))
+      .attr("cy", (d: any) => yScale(d))
       .attr("r", 4)
       .attr("fill", "blue");
   };

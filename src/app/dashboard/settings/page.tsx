@@ -20,8 +20,15 @@ import {
 } from "@/components/ui/select";
 import DashboardLayout from "@/components/DashboardLayout";
 
+type SettingsType = {
+  refreshRate: number;
+  dataSources: string[]; // Explicitly declare the type as string[]
+  modelPreference: string;
+  trackedMetrics: string[]; // Explicitly declare the type as string[]
+};
+
 export default function Settings() {
-  const [settings, setSettings] = useState({
+  const [settings, setSettings] = useState<SettingsType>({
     refreshRate: 5,
     dataSources: [],
     modelPreference: "balanced",
@@ -42,7 +49,7 @@ export default function Settings() {
     }
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: any) => {
     e.preventDefault();
     try {
       await fetch("/api/settings", {

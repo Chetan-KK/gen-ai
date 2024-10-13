@@ -67,7 +67,8 @@ const Sidebar = () => {
               "w-full justify-start"
             )}
             style={{
-              backgroundColor: path === link.route && "hsl(var(--border))",
+              backgroundColor:
+                path === link.route ? "hsl(var(--border))" : undefined,
             }}
           >
             {link.name}

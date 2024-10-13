@@ -19,8 +19,18 @@ import {
 import * as d3 from "d3";
 import DashboardLayout from "@/components/DashboardLayout";
 
+// Define the structure of a decision
+interface Decision {
+  id: string;
+  date: string;
+  description: string;
+  outcome: string;
+  impact: string;
+  impactValue: number;
+}
+
 export default function DecisionTracking() {
-  const [decisionHistory, setDecisionHistory] = useState([]);
+  const [decisionHistory, setDecisionHistory] = useState<Decision[]>([]);
   const chartRef = useRef(null);
 
   useEffect(() => {
@@ -36,7 +46,7 @@ export default function DecisionTracking() {
   const fetchDecisionHistory = async () => {
     try {
       const response = await fetch("/api/decisions/history");
-      const data = await response.json();
+      const data: Decision[] = await response.json(); // Explicitly cast the response to an array of Decision
       setDecisionHistory(data);
     } catch (error) {
       console.error("Error fetching decision history:", error);
@@ -49,16 +59,24 @@ export default function DecisionTracking() {
       .append("svg")
       .attr("width", "100%")
       .attr("height", 300)
-      .attr("viewBox", `0 0 600 300`);
+      .attr("viewBox", "0 0 600 300");
 
     const x = d3
       .scaleTime()
-      .domain(d3.extent(decisionHistory, (d) => new Date(d.date)))
+      .domain(
+        d3.extent(decisionHistory, (d: Decision) => new Date(d.date)) as [
+          Date,
+          Date
+        ]
+      )
       .range([0, 580]);
 
     const y = d3
       .scaleLinear()
-      .domain([0, d3.max(decisionHistory, (d) => d.impactValue)])
+      .domain([
+        0,
+        d3.max(decisionHistory, (d: Decision) => d.impactValue) as number,
+      ])
       .range([280, 0]);
 
     svg
@@ -73,8 +91,8 @@ export default function DecisionTracking() {
       .data(decisionHistory)
       .enter()
       .append("circle")
-      .attr("cx", (d) => x(new Date(d.date)) + 10)
-      .attr("cy", (d) => y(d.impactValue))
+      .attr("cx", (d: Decision) => x(new Date(d.date)) + 10)
+      .attr("cy", (d: Decision) => y(d.impactValue))
       .attr("r", 5)
       .attr("fill", "red");
   };

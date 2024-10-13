@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, FormEvent } from "react";
 import {
   Card,
   CardContent,
@@ -12,13 +12,20 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import DashboardLayout from "@/components/DashboardLayout";
 
-export default function QAInteraction() {
-  const [question, setQuestion] = useState("");
-  const [answer, setAnswer] = useState("");
-  const [history, setHistory] = useState([]);
+// Define the structure of a history item
+interface HistoryItem {
+  question: string;
+  answer: string;
+}
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+export default function QAInteraction() {
+  const [question, setQuestion] = useState<string>(""); // Explicitly typing question as a string
+  const [answer, setAnswer] = useState<string>(""); // Typing answer as a string
+  const [history, setHistory] = useState<HistoryItem[]>([]); // Typing history as an array of HistoryItem
+
+  const handleSubmit = async (e: FormEvent) => {
+    e.preventDefault(); // Ensure correct typing for form submission event
+
     try {
       const response = await fetch("/api/decisions/qa", {
         method: "POST",
@@ -27,10 +34,14 @@ export default function QAInteraction() {
         },
         body: JSON.stringify({ question }),
       });
-      const data = await response.json();
+
+      const data: { answer: string } = await response.json(); // Typing the response
       setAnswer(data.answer);
-      setHistory([...history, { question, answer: data.answer }]);
-      setQuestion("");
+      setHistory((prevHistory) => [
+        ...prevHistory,
+        { question, answer: data.answer },
+      ]); // Add the new question and answer to history
+      setQuestion(""); // Reset the question input
     } catch (error) {
       console.error("Error fetching answer:", error);
     }
@@ -50,17 +61,19 @@ export default function QAInteraction() {
             <Input
               type="text"
               value={question}
-              onChange={(e) => setQuestion(e.target.value)}
+              onChange={(e) => setQuestion(e.target.value)} // Set the question input
               placeholder="Ask a question..."
             />
             <Button type="submit">Submit</Button>
           </form>
+
           {answer && (
             <div className="mt-4 p-4 bg-gray-100 rounded">
               <h3 className="font-semibold">Answer:</h3>
               <p>{answer}</p>
             </div>
           )}
+
           {history.length > 0 && (
             <div className="mt-8">
               <h3 className="font-semibold mb-2">Question History:</h3>

@@ -13,9 +13,18 @@ import {
 import * as d3 from "d3";
 import DashboardLayout from "@/components/DashboardLayout";
 
+// Define the type for insights
+interface InsightData {
+  summary: string;
+  chartData: { date: string; value: number }[];
+}
+
 export default function Dashboard() {
   const [inputData, setInputData] = useState("");
-  const [insights, setInsights] = useState(null);
+
+  // Type `insights` as `InsightData | null` since it may start as `null`
+  const [insights, setInsights] = useState<InsightData | null>(null);
+
   const chartRef = useRef(null);
 
   const handleSubmit = async () => {
@@ -28,7 +37,7 @@ export default function Dashboard() {
         body: JSON.stringify({ data: inputData }),
       });
       const data = await response.json();
-      setInsights(data);
+      setInsights(data); // TypeScript now knows the shape of `data`
     } catch (error) {
       console.error("Error fetching insights:", error);
     }
@@ -40,7 +49,7 @@ export default function Dashboard() {
     }
   }, [insights]);
 
-  const renderChart = (chartData) => {
+  const renderChart = (chartData: { date: string; value: number }[]) => {
     // Clear any previous chart
     d3.select(chartRef.current).select("svg").remove();
 
@@ -55,12 +64,14 @@ export default function Dashboard() {
     // Create scales
     const x = d3
       .scaleTime()
-      .domain(d3.extent(chartData, (d) => new Date(d.date)))
+      .domain(
+        d3.extent(chartData, (d: any) => new Date(d.date)) as [Date, Date]
+      )
       .range([50, 550]);
 
     const y = d3
       .scaleLinear()
-      .domain([0, d3.max(chartData, (d) => d.value)])
+      .domain([0, d3.max(chartData, (d: any) => d.value) as number])
       .range([250, 50]);
 
     // Create axes
@@ -74,8 +85,8 @@ export default function Dashboard() {
     // Create line
     const line = d3
       .line()
-      .x((d) => x(new Date(d.date)))
-      .y((d) => y(d.value));
+      .x((d: any) => x(new Date(d.date)))
+      .y((d: any) => y(d.value));
 
     svg
       .append("path")

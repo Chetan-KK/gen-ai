@@ -18,10 +18,16 @@ import {
 import * as d3 from "d3";
 import DashboardLayout from "@/components/DashboardLayout";
 
+// Define the shape of the chart data
+interface ChartData {
+  labels: string[];
+  values: number[];
+}
+
 export default function Visualizations() {
-  const [chartData, setChartData] = useState(null);
-  const [chartType, setChartType] = useState("bar");
-  const chartRef = useRef();
+  const [chartData, setChartData] = useState<ChartData | null>(null); // Explicitly define the type of chartData
+  const [chartType, setChartType] = useState<"bar" | "line" | "scatter">("bar"); // Restrict to specific chart types
+  const chartRef = useRef<SVGSVGElement | null>(null); // Ref for the SVG element
 
   useEffect(() => {
     fetchChartData();
@@ -36,7 +42,7 @@ export default function Visualizations() {
   const fetchChartData = async () => {
     try {
       const response = await fetch("/api/decisions/chart-data");
-      const data = await response.json();
+      const data: ChartData = await response.json(); // Specify the type of response data
       setChartData(data);
     } catch (error) {
       console.error("Error fetching chart data:", error);
@@ -44,6 +50,8 @@ export default function Visualizations() {
   };
 
   const renderChart = () => {
+    if (!chartRef.current || !chartData) return; // Ensure chartRef and chartData are available
+
     const svg = d3.select(chartRef.current);
     svg.selectAll("*").remove(); // Clear previous chart
 
@@ -61,16 +69,16 @@ export default function Visualizations() {
 
     const yScale = d3
       .scaleLinear()
-      .domain([0, d3.max(chartData.values)])
+      .domain([0, d3.max(chartData.values) || 0])
       .nice()
       .range([height - margin.bottom, margin.top]);
 
-    const xAxis = (g) =>
+    const xAxis = (g: any) =>
       g
         .attr("transform", `translate(0,${height - margin.bottom})`)
         .call(d3.axisBottom(xScale).tickSizeOuter(0));
 
-    const yAxis = (g) =>
+    const yAxis = (g: any) =>
       g
         .attr("transform", `translate(${margin.left},0)`)
         .call(d3.axisLeft(yScale));
@@ -85,9 +93,9 @@ export default function Visualizations() {
           .selectAll("rect")
           .data(chartData.values)
           .join("rect")
-          .attr("x", (d, i) => xScale(chartData.labels[i]))
-          .attr("y", (d) => yScale(d))
-          .attr("height", (d) => yScale(0) - yScale(d))
+          .attr("x", (d: any, i: any) => xScale(chartData.labels[i])!)
+          .attr("y", (d: any) => yScale(d))
+          .attr("height", (d: any) => yScale(0) - yScale(d))
           .attr("width", xScale.bandwidth())
           .attr("fill", "steelblue");
         break;
@@ -95,8 +103,11 @@ export default function Visualizations() {
       case "line":
         const line = d3
           .line()
-          .x((d, i) => xScale(chartData.labels[i]) + xScale.bandwidth() / 2)
-          .y((d) => yScale(d));
+          .x(
+            (d: any, i: any) =>
+              xScale(chartData.labels[i])! + xScale.bandwidth() / 2
+          )
+          .y((d: any) => yScale(d));
 
         svg
           .append("path")
@@ -113,9 +124,10 @@ export default function Visualizations() {
           .join("circle")
           .attr(
             "cx",
-            (d, i) => xScale(chartData.labels[i]) + xScale.bandwidth() / 2
+            (d: any, i: any) =>
+              xScale(chartData.labels[i])! + xScale.bandwidth() / 2
           )
-          .attr("cy", (d) => yScale(d))
+          .attr("cy", (d: any) => yScale(d))
           .attr("r", 4)
           .attr("fill", "steelblue");
         break;
@@ -128,9 +140,10 @@ export default function Visualizations() {
           .join("circle")
           .attr(
             "cx",
-            (d, i) => xScale(chartData.labels[i]) + xScale.bandwidth() / 2
+            (d: any, i: any) =>
+              xScale(chartData.labels[i])! + xScale.bandwidth() / 2
           )
-          .attr("cy", (d) => yScale(d))
+          .attr("cy", (d: any) => yScale(d))
           .attr("r", 5)
           .attr("fill", "steelblue");
         break;
@@ -151,7 +164,12 @@ export default function Visualizations() {
         </CardHeader>
         <CardContent>
           <div className="mb-4">
-            <Select value={chartType} onValueChange={setChartType}>
+            <Select
+              value={chartType}
+              onValueChange={(value: string) =>
+                setChartType(value as "bar" | "line" | "scatter")
+              }
+            >
               <SelectTrigger>
                 <SelectValue placeholder="Select chart type" />
               </SelectTrigger>

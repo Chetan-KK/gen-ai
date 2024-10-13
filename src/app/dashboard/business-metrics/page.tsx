@@ -47,12 +47,12 @@ export default function BusinessMetrics() {
 
     const x = d3
       .scaleTime()
-      .domain(d3.extent(chartData, (d) => new Date(d.date)))
+      .domain(d3.extent(chartData, (d: any) => new Date(d.date)))
       .range([0, 580]);
 
     const y = d3
       .scaleLinear()
-      .domain([0, d3.max(chartData, (d) => d.value)])
+      .domain([0, d3.max(chartData, (d: any) => d.value)])
       .range([380, 0]);
 
     svg
@@ -64,8 +64,8 @@ export default function BusinessMetrics() {
 
     const line = d3
       .line()
-      .x((d) => x(new Date(d.date)) + 10)
-      .y((d) => y(d.value));
+      .x((d: any) => x(new Date(d.date)) + 10)
+      .y((d: any) => y(d.value));
 
     svg
       .append("path")
@@ -95,7 +95,7 @@ export default function BusinessMetrics() {
                   <CardTitle className="text-sm font-medium">{key}</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <p className="text-2xl font-bold">{value}</p>
+                  <p className="text-2xl font-bold">{value as string}</p>
                 </CardContent>
               </Card>
             ))}
