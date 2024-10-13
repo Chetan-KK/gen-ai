@@ -1,5 +1,4 @@
 import Header from "@/components/header";
-import InsightsDisplay from "@/components/InsightsDisplay";
 import Authentication from "@/components/Authentication";
 import DashboardLayout from "@/components/DashboardLayout";
 import Link from "next/link";

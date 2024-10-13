@@ -12,7 +12,7 @@ import * as d3 from "d3";
 import DashboardLayout from "@/components/DashboardLayout";
 
 export default function BusinessMetrics() {
-  const [metrics, setMetrics] = useState(null);
+  const [metrics, setMetrics] = useState<any>(null);
   const chartRef = useRef(null);
 
   useEffect(() => {
@@ -21,7 +21,9 @@ export default function BusinessMetrics() {
 
   useEffect(() => {
     if (metrics) {
-      renderChart(metrics.chartData);
+      if (metrics.chartData) {
+        renderChart(metrics.chartData);
+      }
     }
   }, [metrics]);
 
