@@ -20,7 +20,7 @@ import {
 } from "@/components/ui/select";
 import DashboardLayout from "@/components/DashboardLayout";
 
-export default function Settings({ user }) {
+export default function Settings() {
   const [settings, setSettings] = useState({
     refreshRate: 5,
     dataSources: [],
