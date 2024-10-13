@@ -37,7 +37,7 @@ export default function BusinessMetrics() {
     }
   };
 
-  const renderChart = (chartData) => {
+  const renderChart = (chartData: any) => {
     const svg = d3
       .select(chartRef.current)
       .append("svg")
