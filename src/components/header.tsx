@@ -6,7 +6,7 @@ type Props = {};
 const Header = (props: Props) => {
   return (
     <header className="p-5 flex justify-between items-center">
-      <div>next-src-ts-tailwind-shadcn</div>
+      <div>Generative AI-powered decision-making system</div>
       <ModeToggle />
     </header>
   );
